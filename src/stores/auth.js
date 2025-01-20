@@ -4,17 +4,16 @@ import axios from 'axios'
 
 const URL = `https://frontend-take-home-service.fetch.com/`
 
-const saveUserCredentials = (name, email) => {
-  const encryptedCredentials = btoa(JSON.stringify({ name, email }))
-  localStorage.setItem('userInfo', encryptedCredentials)
-}
-
 const getUserCredentials = () => {
-  const encryptedCredentials = localStorage.getItem('userInfo')
-  if (encryptedCredentials) {
-    return JSON.parse(atob(encryptedCredentials))
+  const storedCredentials = localStorage.getItem('userInfo')
+  if (storedCredentials) {
+    return JSON.parse(storedCredentials) // Parse the JSON string
   }
   return null
+}
+
+const saveUserCredentials = (currentUser) => {
+  localStorage.setItem('userInfo', JSON.stringify(currentUser)) // Save as JSON string
 }
 
 const clearUserCredentials = () => {
@@ -30,12 +29,13 @@ const useAuthStore = defineStore('auth', () => {
     try {
       await axios.post(`${URL}auth/login`, { name, email }, { withCredentials: true })
 
-      userInfo.value = { name, email }
-      saveUserCredentials(name, email)
+      const currentUser = { name, email }
+      userInfo.value = currentUser
+      saveUserCredentials(currentUser)
       startReLoginTimer()
       console.log('User logged in successfully')
     } catch (error) {
-      console.error('Login failed:', error)
+      console.error('Login failed:', error.response?.data || error.message)
     }
   }
 
@@ -43,17 +43,20 @@ const useAuthStore = defineStore('auth', () => {
     const credentials = getUserCredentials()
     if (!credentials) {
       console.error('No saved credentials found for re-login')
+      stopReLoginTimer()
+      userInfo.value = null
       return
     }
 
     try {
       await axios.post(`${URL}auth/login`, credentials, { withCredentials: true })
 
-      userInfo.value = credentials
+      userInfo.value = credentials // Update userInfo in memory
+      saveUserCredentials(credentials) // Update in localStorage
       console.log('User re-logged in successfully')
     } catch (error) {
-      console.error('Re-login failed:', error)
-      stopReLoginTimer() // Stop timer if re-login fails
+      console.error('Re-login failed:', error.response?.data || error.message)
+      stopReLoginTimer()
       userInfo.value = null
       clearUserCredentials()
     }
@@ -64,11 +67,10 @@ const useAuthStore = defineStore('auth', () => {
       await axios.post(`${URL}auth/logout`, {}, { withCredentials: true })
 
       userInfo.value = null
-      clearUserCredentials()
       stopReLoginTimer()
       console.log('User logged out successfully')
     } catch (error) {
-      console.error('Logout failed:', error)
+      console.error('Logout failed:', error.response?.data || error.message)
     }
   }
 
@@ -76,22 +78,20 @@ const useAuthStore = defineStore('auth', () => {
     if (reLoginTimer) {
       clearInterval(reLoginTimer) // Clear existing timer if any
     }
-    // Set the timer to re-login 1 minute before session expiry (e.g., 59 minutes)
     reLoginTimer = setInterval(
       () => {
         reLogin()
       },
-      59 * 60 * 1000,
+      57 * 60 * 1000,
     )
     console.log('Re-login timer started')
   }
 
-  // Stop re-login timer
   const stopReLoginTimer = () => {
     if (reLoginTimer) {
       clearInterval(reLoginTimer)
+      clearUserCredentials()
       reLoginTimer = null
-      console.log('Re-login timer stopped')
     }
   }
 
