@@ -26,15 +26,10 @@ const useDogsStore = defineStore('dogs', () => {
     }
   }
 
-  const performDogSearch = async (filters, page = 1) => {
+  const performDogSearch = async (filters, page = 1, sort = 'name:asc') => {
     try {
       const params = new URLSearchParams()
-      const pageSize = 25 // API default size
 
-      // Validate and calculate `from`
-      const from = (Math.max(1, page) - 1) * pageSize
-
-      // Append filters to the query string
       if (Array.isArray(filters.breeds) && filters.breeds.length > 0) {
         filters.breeds.forEach((breed) => params.append('breeds', breed))
       }
@@ -47,11 +42,14 @@ const useDogsStore = defineStore('dogs', () => {
       if (filters.maxAge) {
         params.append('ageMax', filters.maxAge)
       }
+      if (sort) {
+        params.append('sort', sort)
+      }
 
+      const pageSize = 25
       params.append('size', pageSize)
-      params.append('from', from)
+      params.append('from', (page - 1) * pageSize)
 
-      // Fetch data from API
       const response = await fetch(`${URL}/dogs/search?${params.toString()}`, {
         method: 'GET',
         credentials: 'include',
