@@ -1,14 +1,31 @@
-# fetch-app
+## Fetch App
 
-This template should help get you started developing with Vue 3 in Vite.
+This application is built with Vue 3 and Vite to provide a seamless and efficient development experience.
 
-## Recommended IDE Setup
+## About
 
-[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
+The app connects to the Fetch API to search for dog information based on various filters like breed, zip code, and age. However, due to API constraints, sorting could not be implemented since the /dogs/search endpoint only returns IDs instead of full dog objects.
 
-## Customize configuration
+## Features
 
-See [Vite Configuration Reference](https://vite.dev/config/).
+- Filter Dogs by breed, zip code, and age range.
+- Built with:
+  - **Vue 3** for the frontend framework.
+  - **Vite** for fast builds and hot module replacement.
+- Responsive and clean UI.
+
+## Known Limitations
+
+Sorting: Sorting functionality is not implemented. The /dogs/search API endpoint only returns IDs instead of full dog objects, making it infeasible to sort the results directly.
+
+## Requirements
+
+Recommended IDE: VSCode with the Volar extension (disable Vetur).
+
+## Additional Notes
+
+- Refer to the Vite Documentation for advanced configuration options.
+- Contributions are welcome! Please follow best practices for Vue and Vite development.
 
 ## Project Setup
 
