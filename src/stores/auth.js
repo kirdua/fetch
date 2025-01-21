@@ -1,108 +1,55 @@
 import { ref, computed } from 'vue'
 import { defineStore } from 'pinia'
 import axios from 'axios'
+import { useRouter } from 'vue-router'
 
-const URL = `https://frontend-take-home-service.fetch.com/`
+const API_URL = 'https://frontend-take-home-service.fetch.com/'
 
-const getUserCredentials = () => {
-  const storedCredentials = localStorage.getItem('userInfo')
-  if (storedCredentials) {
-    return JSON.parse(storedCredentials) // Parse the JSON string
+export const useAuthStore = defineStore('auth', () => {
+  const router = useRouter()
+
+  // Reactive state
+  const userInfo = ref(JSON.parse(localStorage.getItem('userInfo')) || null)
+
+  // Save user info in state and localStorage
+  const saveUserInfo = (user) => {
+    userInfo.value = user
+    localStorage.setItem('userInfo', JSON.stringify(user))
   }
-  return null
-}
 
-const saveUserCredentials = (currentUser) => {
-  localStorage.setItem('userInfo', JSON.stringify(currentUser)) // Save as JSON string
-}
+  // Clear user info from state and localStorage
+  const clearUserInfo = () => {
+    userInfo.value = null
+    localStorage.removeItem('userInfo')
+  }
 
-const clearUserCredentials = () => {
-  localStorage.removeItem('userInfo')
-}
-
-const useAuthStore = defineStore('auth', () => {
-  const userInfo = ref(getUserCredentials())
-  const userLoggedIn = computed(() => userInfo.value !== null)
-  let reLoginTimer = null
-
+  // Login method
   const login = async (name, email) => {
     try {
-      await axios.post(`${URL}auth/login`, { name, email }, { withCredentials: true })
-
-      const currentUser = { name, email }
-      userInfo.value = currentUser
-      saveUserCredentials(currentUser)
-      startReLoginTimer()
-      console.log('User logged in successfully')
+      await axios.post(`${API_URL}auth/login`, { name, email }, { withCredentials: true })
+      saveUserInfo({ name, email })
+      router.push('/dogsearch') // Redirect to dogsearch after login
     } catch (error) {
       console.error('Login failed:', error.response?.data || error.message)
     }
   }
 
-  const reLogin = async () => {
-    const credentials = getUserCredentials()
-    if (!credentials) {
-      console.error('No saved credentials found for re-login')
-      stopReLoginTimer()
-      userInfo.value = null
-      return
-    }
-
-    try {
-      await axios.post(`${URL}auth/login`, credentials, { withCredentials: true })
-
-      userInfo.value = credentials // Update userInfo in memory
-      saveUserCredentials(credentials) // Update in localStorage
-      console.log('User re-logged in successfully')
-    } catch (error) {
-      console.error('Re-login failed:', error.response?.data || error.message)
-      stopReLoginTimer()
-      userInfo.value = null
-      clearUserCredentials()
-    }
-  }
-
+  // Logout method
   const logout = async () => {
     try {
-      await axios.post(`${URL}auth/logout`, {}, { withCredentials: true })
-
-      userInfo.value = null
-      stopReLoginTimer()
-      console.log('User logged out successfully')
+      await axios.post(`${API_URL}auth/logout`, {}, { withCredentials: true })
     } catch (error) {
       console.error('Logout failed:', error.response?.data || error.message)
-    }
-  }
-
-  const startReLoginTimer = () => {
-    if (reLoginTimer) {
-      clearInterval(reLoginTimer) // Clear existing timer if any
-    }
-    reLoginTimer = setInterval(
-      () => {
-        reLogin()
-      },
-      57 * 60 * 1000,
-    )
-    console.log('Re-login timer started')
-  }
-
-  const stopReLoginTimer = () => {
-    if (reLoginTimer) {
-      clearInterval(reLoginTimer)
-      clearUserCredentials()
-      reLoginTimer = null
+    } finally {
+      clearUserInfo()
+      router.push('/') // Redirect to login page after logout
     }
   }
 
   return {
     userInfo,
-    userLoggedIn,
     login,
-    reLogin,
     logout,
-    startReLoginTimer,
-    stopReLoginTimer,
   }
 })
 

@@ -1,5 +1,4 @@
 <script setup>
-import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import useAuthStore from '@/stores/auth'
 
@@ -16,11 +15,11 @@ const items = [
 
 const logout = () => {
   authStore.logout()
-  router.push({ name: 'login' })
+  router.push('/')
 }
 </script>
 <template>
-  <v-app-bar :elevation="2" color="light-teal" flat class="justify-end dropshadow">
+  <v-app-bar :elevation="2" color="dark-blue" flat class="justify-end dropshadow">
     <template v-slot:prepend>
       <v-app-bar-title class="text-white">
         <h2>Find your best friend!</h2>
