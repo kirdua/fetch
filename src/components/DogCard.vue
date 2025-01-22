@@ -1,5 +1,4 @@
 <script setup>
-import { defineProps } from 'vue'
 import myKit from '@/assets/imgs/kit.jpeg'
 
 const dogInfo = defineProps(['dogId'])

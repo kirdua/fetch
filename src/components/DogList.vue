@@ -1,8 +1,7 @@
 <script setup>
-import { defineProps } from 'vue'
 import DogCard from '@/components/DogCard.vue'
 
-const props = defineProps({
+defineProps({
   dogs: Array,
 })
 </script>

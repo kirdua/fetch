@@ -9,13 +9,12 @@ const items = [
   {
     title: 'Logout',
     icon: 'mdi-logout',
-    action: () => authStore.logout(),
   },
 ]
 
 const logout = () => {
   authStore.logout()
-  router.push('/')
+  router.push('/login')
 }
 </script>
 <template>

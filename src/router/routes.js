@@ -1,20 +1,24 @@
-export const routes = [
+const routes = [
   {
     path: '/',
-    name: 'login',
-    component: () => import('@/views/login/Login.vue'),
-  },
-  {
-    path: '/dogsearch',
     name: 'dogsearch',
     component: () => import('@/views/dogsearch/DogSearch.vue'),
     beforeEnter(to, from, next) {
       next()
     },
-    meta: { requiresAuth: true },
+    meta: {
+      requiresAuth: true,
+    },
+  },
+  {
+    path: '/login',
+    name: 'login',
+    component: () => import('@/views/login/Login.vue'),
   },
   {
     path: '/:catchAll(.*)*',
-    redirect: { name: 'login' },
+    redirect: { name: 'dogsearch' },
   },
 ]
+
+export default routes

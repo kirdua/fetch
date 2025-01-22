@@ -18,10 +18,7 @@ onMounted(() => {
 const login = async () => {
   try {
     await authStore.login(name.value, email.value)
-
-    if (authStore.userLoggedIn) {
-      router.push({ name: 'dogsearch' })
-    }
+    router.push('/')
   } catch (error) {
     console.error('Login failed:', error)
   }
