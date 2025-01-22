@@ -11,7 +11,7 @@ const name = ref('')
 
 onMounted(() => {
   if (authStore.userLoggedIn) {
-    router.push({ name: 'dogsearch' })
+    router.push('/')
   }
 })
 
