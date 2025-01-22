@@ -20,8 +20,8 @@ const logout = () => {
 <template>
   <v-app-bar :elevation="2" color="dark-blue" flat class="justify-end dropshadow">
     <template v-slot:prepend>
-      <v-app-bar-title class="text-white">
-        <h2>Find your best friend!</h2>
+      <v-app-bar-title class="text-white pl-2">
+        <h3>Available Dogs!</h3>
       </v-app-bar-title>
     </template>
 
